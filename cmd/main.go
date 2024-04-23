@@ -1,9 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"fmt"
-	"image"
 	_ "image/png"
 	"log"
 
@@ -11,11 +8,7 @@ import (
 )
 
 func main() {
-	b := run.Run_png
-	img, name, err := image.Decode(bytes.NewReader(b))
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(name)
-	fmt.Println(img)
+	run.InitImgs()
+	is := run.Imgs
+	log.Printf("is: %v\n", is)
 }

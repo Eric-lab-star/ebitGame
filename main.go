@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"image"
 	"image/color"
 	_ "image/png"
@@ -18,7 +17,7 @@ const (
 	imgHeight    float64 = 64
 )
 
-var runnerImg *ebi.Image
+var runnerImg []*ebi.Image
 
 // Game implements ebi.Game interface.
 type Game struct {
@@ -39,8 +38,9 @@ func (g *Game) Draw(screen *ebi.Image) {
 	op.GeoM.Translate(float64(screenWidth)/2, float64(screenHeight)/2)
 	op.GeoM.Translate(-imgWidth/2, -imgHeight/2)
 	screen.Fill(color.White)
-	screen.DrawImage(runnerImg, op)
-	// Write your game's rendering.
+	speed := g.count / 8
+	index := (speed) % 6
+	screen.DrawImage(runnerImg[index], op)
 }
 
 // Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.
@@ -50,12 +50,16 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func main() {
-	b := run.Run_png
-	img, _, err := image.Decode(bytes.NewReader(b))
-	if err != nil {
-		panic(err)
+	run.InitImgs()
+	for _, b := range run.Imgs {
+		img, _, err := image.Decode(b)
+		if err != nil {
+			log.Printf("err %v\n ", err)
+		}
+
+		ebiImg := ebi.NewImageFromImage(img)
+		runnerImg = append(runnerImg, ebiImg)
 	}
-	runnerImg = ebi.NewImageFromImage(img)
 
 	game := &Game{}
 	// Specify the window size as you like. Here, a doubled size is specified.
